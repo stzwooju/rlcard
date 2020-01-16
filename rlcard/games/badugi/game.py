@@ -8,18 +8,14 @@ from rlcard.games.badugi.round import BadugiRound as Round
 
 class BadugiGame(object):
 
-    def __init__(self, seed_money, allow_step_back=False):
+    def __init__(self, allow_step_back=False):
         ''' Initialize the class limitholdem Game
         '''
-        self.seed_money = seed_money
+        self.seed_money = 100
         self.allow_step_back = allow_step_back
-
         self.allowed_raise_num = 2
-
         self.num_players = 5
-
         self.round_num = 7
-
         self.history_raise_nums = [0 for _ in range(self.round_num)]
 
     def init_game(self):
@@ -188,18 +184,17 @@ class BadugiGame(object):
 
 # Test the game
 
-if __name__ == "__main__":
-    game = BadugiGame(seed_money=100)
-    print('New Game')
-    state, game_pointer = game.init_game()
-    print(game_pointer, state)
+# if __name__ == "__main__":
+#     game = BadugiGame()
+#     print('New Game')
+#     state, game_pointer = game.init_game()
+#     print(game_pointer, state)
         
-    while not game.is_over():
-        legal_actions = game.get_legal_actions()
-        action = np.random.choice(legal_actions)
-        print(game_pointer, action, legal_actions)
-        state, game_pointer = game.step(action)
-        print(game_pointer, state)
+#     while not game.is_over():
+#         legal_actions = game.get_legal_actions()
+#         action = np.random.choice(legal_actions)
+#         print(game_pointer, action, legal_actions)
+#         state, game_pointer = game.step(action)
+#         print(game_pointer, state)
     
-    print(game.get_payoffs())
-
+#     print(game.get_payoffs())
