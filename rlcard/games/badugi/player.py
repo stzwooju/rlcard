@@ -21,7 +21,7 @@ class BadugiPlayer(object):
         # The chips that this player has put in until now
         self.in_chips = 0
 
-    def get_state(self, public_cards, all_chips, legal_actions):
+    def get_state(self, all_chips, legal_actions):
         ''' Encode the state for the player
 
         Args:
@@ -32,11 +32,10 @@ class BadugiPlayer(object):
             (dict): The state of the player
         '''
         state = {}
-        # state['hand'] = [c.get_index() for c in self.hand]
-        # state['public_cards'] = [c.get_index() for c in public_cards]
-        # state['all_chips'] = all_chips
-        # state['my_chips'] = self.in_chips
-        # state['legal_actions'] = legal_actions
+        state['hand'] = [c.get_index() for c in self.hand]
+        state['all_chips'] = all_chips
+        state['my_chips'] = self.in_chips
+        state['legal_actions'] = legal_actions
         return state
 
     def get_player_id(self):
@@ -49,20 +48,22 @@ class BadugiPlayer(object):
         '''
         random.shuffle(self.deck)
 
-    def get_cards(num):
+    def get_cards(self, num):
         cards = []
         while num > 0:
             cards.append(self.deck.pop())
             num -= 1
         return cards
     
-    def change_cards(idx):
+    def change_cards(self, idx):
         if idx is None:
             return self.hand
 
         idxs = idx.split(',')
+        hand = self.hand.copy()
         for i in idxs:
-            del self.hand[i]
-        self.hand += self.get_cards(len(idxs))
+            hand.remove(self.hand[int(i)])
+
+        self.hand = hand + self.get_cards(len(idxs))
 
         return self.hand

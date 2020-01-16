@@ -12,10 +12,10 @@ class BadugiRound(object):
         self.allowed_raise_num = allowed_raise_num
         self.num_players = num_players
         self.seed_money = seed_money
-        self.total_bet = 0
 
         # Count the number of raise
         self.have_raised = 0
+        self.died = 0
 
         # Count the number without raise
         # If every player agree to not raise, the round is over
@@ -26,9 +26,10 @@ class BadugiRound(object):
         self.raise_cnt = [0 for _ in range(self.num_players)]
         self.previous_action = [None for _ in range(self.num_players)]
 
-        self.is_bet_round = True
+        self.is_bet_round = False
+        self.is_first = True
 
-    def start_new_round(self, game_pointer, total_bet, raised=None):
+    def start_new_round(self, game_pointer, raised=None):
         ''' Start a new bidding round
 
         Args:
@@ -37,7 +38,6 @@ class BadugiRound(object):
         '''
         self.start_pointer = game_pointer
         self.game_pointer = game_pointer
-        self.total_bet = total_bet
 
         self.previous_bet = 0
         self.have_raised = 0
@@ -52,6 +52,7 @@ class BadugiRound(object):
         self.previous_action = [None for _ in range(self.num_players)]
 
         self.is_bet_round = not self.is_bet_round
+        self.is_first = True
 
     def proceed_round(self, players, action):
         if action not in self.get_legal_actions():
@@ -61,6 +62,7 @@ class BadugiRound(object):
             bet = 0
             if action == 'die':
                 players[self.game_pointer].status = 'died'
+                self.died += 1
             elif action == 'call':
                 bet = max(self.raised) - self.raised[self.game_pointer]
             elif action == 'bbing':
@@ -69,25 +71,27 @@ class BadugiRound(object):
                 bet = self.previous_bet * 2 - self.raised[self.game_pointer]
             elif action == 'quarter':
                 diff = max(self.raised) - self.raised[self.game_pointer]
-                total_bet = self.total_bet + sum(self.raised)
-                bet = round((total_bet + diff) * 0.25) + diff
+                bet = round((sum(self.raised) + diff) * 0.25) + diff
             elif action == 'half':
                 diff = max(self.raised) - self.raised[self.game_pointer]
-                total_bet = self.total_bet + sum(self.raised)
-                bet = round((total_bet + diff) * 0.5) + diff
+                bet = round((sum(self.raised) + diff) * 0.5) + diff
             
             self.previous_bet = bet + self.raised[self.game_pointer]
             self.raised[self.game_pointer] += bet
             players[self.game_pointer].in_chips += bet
             self.previous_action[self.game_pointer] = action
 
-            if action in ['die', 'call', 'check']:
-                self.not_raise_num = +=1
+            if action in ['call', 'check']:
+                self.not_raise_num += 1
             elif action in ['bbing', 'ddadang', 'quarter', 'half']:
+                self.raise_cnt[self.game_pointer] += 1
                 self.have_raised += 1
                 self.not_raise_num = 1
+            
+            self.is_first = self.is_first and (action == 'die')
         else:
             players[self.game_pointer].change_cards(action)
+            self.is_first = False
 
         self.game_pointer = (self.game_pointer + 1) % self.num_players
 
@@ -104,13 +108,20 @@ class BadugiRound(object):
            (list):  A list of legal actions
         '''
         if self.is_bet_round:
-            return get_bet_actions()
+            return self.get_bet_actions()
         else:
-            return get_change_actions()
+            return self.get_change_actions()
     
-    @staticmethod
-    def get_bet_actions():
-        actions = ['die', 'call', 'check', 'bbing', 'ddadang', 'quarter', 'half']
+    def get_bet_actions(self):
+        if self.is_first:
+            actions = ['die', 'check', 'bbing']
+        elif self.previous_action[self.game_pointer] == 'call' or \
+             self.raise_cnt[self.game_pointer] >= self.allowed_raise_num:
+            actions = ['die', 'call']
+        elif self.previous_bet == 0:
+            actions = ['die', 'call', 'quarter', 'half']
+        else:
+            actions = ['die', 'call', 'ddadang', 'quarter', 'half']
         return actions
     
     @staticmethod
@@ -123,24 +134,33 @@ class BadugiRound(object):
         Returns:
             (boolean): True if the current round is over
         '''
-        if self.not_raise_num >= self.num_players:
-            return True
-        return False
+        if self.is_bet_round:
+            return self.not_raise_num + self.died >= self.num_players
+        else:
+            return not self.is_first and self.game_pointer == self.start_pointer
 
 
-if __name__ == '__main__':
-    import numpy as np
-    from rlcard.games.badugi.player import BadugiPlayer as Player
+# if __name__ == '__main__':
+#     import numpy as np
+#     from rlcard.games.badugi.player import BadugiPlayer as Player
     
-    players = [Player(i) for i in range(5)]
-    game_pointer = 0
-    r = BadugiRound(4, 5, 100)
-    r.start_new_round(game_pointer=game_pointer, total_bet=0)
-    print(r.raised, r.have_raised, r.not_raise_num)
+#     players = [Player(i) for i in range(5)]
+#     game_pointer = 0
+#     r = BadugiRound(2, 5, 100)
+#     r.start_new_round(game_pointer=game_pointer)
     
-    while not r.is_over():
-        legal_actions = r.get_legal_actions()
-        action = np.random.choice(legal_actions)
-        print(game_pointer, action, legal_actions)
-        game_pointer = r.proceed_round(players[game_pointer], action)
-        print(r.raised, r.have_raised, r.not_raise_num)
+#     while not r.is_over():
+#         legal_actions = r.get_legal_actions()
+#         action = np.random.choice(legal_actions)
+#         print(game_pointer, action, legal_actions)
+#         game_pointer = r.proceed_round(players, action)
+#         print(r.raised, r.have_raised, r.not_raise_num)
+
+#     r.start_new_round(game_pointer = game_pointer)
+
+#     while not r.is_over():
+#         legal_actions = r.get_legal_actions()
+#         action = np.random.choice(legal_actions)
+#         print(game_pointer, action, legal_actions)
+#         game_pointer = r.proceed_round(players, action)
+#         print(r.raised, r.have_raised, r.not_raise_num)

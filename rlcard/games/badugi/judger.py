@@ -21,11 +21,14 @@ class BadugiJudger(object):
             (list): Each entry of the list corresponds to one entry of the
         '''
         winners = compare_hands(hands)
+        print(winners)
 
         # Compute the total chips
         total = 0
         for p in players:
             total += p.in_chips
+
+        print(total)
 
         each_win = float(total) / sum(winners)
 
