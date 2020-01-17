@@ -13,7 +13,7 @@ class BadugiGame(object):
         '''
         self.seed_money = 100
         self.allow_step_back = allow_step_back
-        self.allowed_raise_num = 2
+        self.allowed_raise_num = 1
         self.num_players = 5
         self.round_num = 7
         self.history_raise_nums = [0 for _ in range(self.round_num)]
@@ -45,7 +45,9 @@ class BadugiGame(object):
                            num_players=self.num_players,
                            seed_money=self.seed_money)
 
-        self.round.start_new_round(game_pointer=self.game_pointer, raised=[p.in_chips for p in self.players])
+        self.round.start_new_round(game_pointer=self.game_pointer,
+                                   allowed_raise_num=self.allowed_raise_num
+                                   raised=[p.in_chips for p in self.players])
 
         # Count the round. There are 7 rounds in each game.
         self.round_counter = 0
@@ -90,7 +92,11 @@ class BadugiGame(object):
         # If a round is over, we deal more public cards
         if self.round.is_over():
             self.round_counter += 1
-            self.round.start_new_round(self.game_pointer)
+            if self.round_counter >= 4:
+                self.allowed_raise_num = 2
+            self.round.start_new_round(game_pointer=self.game_pointer,
+                                       allowed_raise_num=self.allowed_raise_num,
+                                       raised=[p.in_chips for p in self.players])
 
         state = self.get_state(self.game_pointer)
 

@@ -29,7 +29,7 @@ class BadugiRound(object):
         self.is_bet_round = False
         self.is_first = True
 
-    def start_new_round(self, game_pointer, raised=None):
+    def start_new_round(self, game_pointer, allowed_raise_num, raised=None):
         ''' Start a new bidding round
 
         Args:
@@ -39,6 +39,7 @@ class BadugiRound(object):
         self.start_pointer = game_pointer
         self.game_pointer = game_pointer
 
+        self.allowed_raise_num = allowed_raise_num
         self.previous_bet = 0
         self.have_raised = 0
         self.not_raise_num = 0
