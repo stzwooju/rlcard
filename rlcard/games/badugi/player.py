@@ -1,6 +1,7 @@
 import random
 
 from rlcard.utils.utils import init_standard_deck
+from rlcard.games.badugi.utils import Hand
 
 class BadugiPlayer(object):
 
@@ -36,6 +37,13 @@ class BadugiPlayer(object):
         state['all_chips'] = all_chips
         state['my_chips'] = self.in_chips
         state['legal_actions'] = legal_actions
+
+        hand = Hand(self.hand)
+        hand.evaluate_hand()
+
+        state['hand_best_index'] = hand.best_index
+        state['hand_category'] = hand.category
+
         return state
 
     def get_player_id(self):

@@ -5,6 +5,7 @@ class Hand:
         self.cards = cards
         self.category = 0
         self.best = None
+        self.best_index = None
 
         self.RANK_LOOKUP = "A23456789TJQK"
         self.RANK_TO_NUM = {'A': 12, '2': 11, '3': 10, '4': 9, '5': 8, '6': 7,
@@ -28,7 +29,7 @@ class Hand:
         self._sort_cards()
 
         for i in range(card_cnt):
-            candidates = combinations(self.cards, card_cnt - i)
+            candidates = combinations(enumerate(self.cards), card_cnt - i)
             for candidate in candidates:
                 candidate_cnt = len(candidate)
                 valid = True
@@ -37,12 +38,12 @@ class Hand:
                     if i == candidate_cnt - 1 or not valid:
                         break
                     for j in range(i + 1, candidate_cnt):
-                        if candidate[i].suit == candidate[j].suit or candidate[i].rank == candidate[j].rank:
+                        if candidate[i][1].suit == candidate[j][1].suit or candidate[i][1].rank == candidate[j][1].rank:
                             valid = False
                             break
                 
                 if valid:
-                    self.best = candidate
+                    self.best_index, self.best = zip(*candidate)
                     break
             if self.best is not None:
                 break
