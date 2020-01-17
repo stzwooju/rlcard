@@ -46,7 +46,7 @@ class BadugiGame(object):
                            seed_money=self.seed_money)
 
         self.round.start_new_round(game_pointer=self.game_pointer,
-                                   allowed_raise_num=self.allowed_raise_num
+                                   allowed_raise_num=self.allowed_raise_num,
                                    raised=[p.in_chips for p in self.players])
 
         # Count the round. There are 7 rounds in each game.
