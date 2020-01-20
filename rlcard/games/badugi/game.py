@@ -121,13 +121,14 @@ class BadugiGame(object):
         '''
         return self.num_players
 
+    @staticmethod
     def get_action_num():
         ''' Return the number of applicable actions
 
         Returns:
             (int): The number of actions. There are 4 actions (call, raise, check and fold)
         '''
-        return len(self.get_legal_actions())
+        return 23
 
     def get_player_id(self):
         ''' Return the current player's id
