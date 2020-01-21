@@ -57,7 +57,7 @@ class Hand:
 
 
 def compare_hands(hands):
-    hand_category = [] # such as high_card, straight_flush, etc
+    hand_category = [] # such as golf, base, etc
     all_players = [0] * len(hands) # all the players in this round, 0 for losing and 1 for winning or draw
 
     if None in hands:

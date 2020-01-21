@@ -28,7 +28,7 @@ class BadugiGame(object):
                 (int): Current player's id
         '''
 
-        # Initilize two players to play the game
+        # Initilize five players to play the game
         self.players = [Player(i) for i in range(self.num_players)]
         for i in range(self.num_players):
             self.players[i].in_chips += self.seed_money
@@ -39,8 +39,7 @@ class BadugiGame(object):
         # Random player plays the first
         self.start_pointer = self.game_pointer = randrange(self.num_players)
 
-        # Initilize a bidding round, in the first round, the big blind and the small blind needs to
-        # be passed to the round for processing.
+        # Initilize a bidding round, in the first round
         self.round = Round(allowed_raise_num=self.allowed_raise_num,
                            num_players=self.num_players,
                            seed_money=self.seed_money)
@@ -66,7 +65,7 @@ class BadugiGame(object):
         ''' Get the next state
 
         Args:
-            action (str): a specific action. (call, raise, fold, or check)
+            action (str): a specific action.
 
         Returns:
             (tuple): Tuple containing:
@@ -89,7 +88,6 @@ class BadugiGame(object):
         # Save the current raise num to history
         self.history_raise_nums[self.round_counter] = self.round.have_raised
 
-        # If a round is over, we deal more public cards
         if self.round.is_over():
             self.round_counter += 1
             if self.round_counter >= 4:
@@ -114,7 +112,7 @@ class BadugiGame(object):
         return False
 
     def get_player_num(self):
-        ''' Return the number of players in Limit Texas Hold'em
+        ''' Return the number of players in Badugi
 
         Returns:
             (int): The number of players in the game
@@ -126,7 +124,7 @@ class BadugiGame(object):
         ''' Return the number of applicable actions
 
         Returns:
-            (int): The number of actions. There are 4 actions (call, raise, check and fold)
+            (int): The number of actions. There are 23 actions
         '''
         return 23
 

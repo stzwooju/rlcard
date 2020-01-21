@@ -26,8 +26,8 @@ class BadugiPlayer(object):
         ''' Encode the state for the player
 
         Args:
-            public_cards (list): A list of public cards that seen by all the players
             all_chips (int): The chips that all players have put in
+            lega_actions (list): Allowed actions
 
         Returns:
             (dict): The state of the player

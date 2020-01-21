@@ -36,13 +36,13 @@ class BadugiEnv(Env):
     def extract_state(self, state):
         ''' Extract the state representation from state dictionary for agent
 
-        Note: Currently the use the hand cards and the public cards. TODO: encode the states
+        Note: Currently use the hand cards. TODO: encode the states
 
         Args:
             state (dict): Original state from the game
 
         Returns:
-            observation (list): combine the player's score and dealer's observable score for observation
+            observation (list): player's score
         '''
         processed_state = {}
 
