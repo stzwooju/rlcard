@@ -87,6 +87,7 @@ class BadugiGame(object):
 
         # Save the current raise num to history
         self.history_raise_nums[self.round_counter] = self.round.have_raised
+        state = self.get_state(self.game_pointer)
 
         if self.round.is_over():
             self.round_counter += 1
@@ -95,8 +96,6 @@ class BadugiGame(object):
             self.round.start_new_round(game_pointer=self.game_pointer,
                                        allowed_raise_num=self.allowed_raise_num,
                                        raised=[p.in_chips for p in self.players])
-
-        state = self.get_state(self.game_pointer)
 
         return state, self.game_pointer
 
@@ -149,6 +148,8 @@ class BadugiGame(object):
         legal_actions = self.get_legal_actions()
         state = self.players[player].get_state(chips, legal_actions)
         state['raise_nums'] = self.history_raise_nums
+        state['payoffs'] = self.get_payoffs()
+        state['is_bet'] = self.round.is_bet_round
 
         return state
 

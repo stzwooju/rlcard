@@ -19,7 +19,7 @@ env.set_agents([agent for _ in range(5)])
 for episode in range(episode_num):
 
     # Generate data from the environment
-    trajectories, _ = env.run(is_training=False)
+    trajectories, _, _ = env.run(is_training=False)
 
     # Print out the trajectories
     print('\nEpisode {}'.format(episode))

@@ -313,6 +313,47 @@ def reorganize(trajectories, payoffs):
             new_trajectories[player].append(transition)
     return new_trajectories
 
+def reorganize_badugi(trajectories):
+    ''' Reorganize the trajectory to make it RL friendly
+
+    Args:
+        trajectory (list): A list of trajectories
+
+    Returns:
+        (list): A new trajectories that can be fed into RL algorithms.
+
+    '''
+    player_num = len(trajectories)
+    new_trajectories = [[] for _ in range(player_num)]
+    bet_reward_sum = 0
+    change_reward_sum = 0
+
+    for player in range(player_num):
+        for i in range(0, len(trajectories[player])-3, 3):
+            if trajectories[player][i]['is_bet']:
+                # reward = trajectories[player][i + 2]['payoffs'][player] - trajectories[player][i]['payoffs'][player]
+                reward = 0
+                if trajectories[player][i + 2]['payoffs'][player] > trajectories[player][i]['payoffs'][player]:
+                    reward = 1
+                elif trajectories[player][i + 2]['payoffs'][player] < trajectories[player][i]['payoffs'][player]:
+                    reward = -1
+                bet_reward_sum += reward
+            else:
+                # reward = trajectories[player][i + 2]['hand_category'] - trajectories[player][i]['hand_category']
+                reward = 0
+                if trajectories[player][i + 2]['hand_category'] > trajectories[player][i]['hand_category']:
+                    reward = 1
+                elif trajectories[player][i + 2]['hand_category'] < trajectories[player][i]['hand_category']:
+                    reward = -1
+                change_reward_sum += reward
+            done = (i == len(trajectories[player]) - 4)
+            transition = trajectories[player][i:i+3].copy()
+            transition.insert(2, reward)
+            transition.append(done)
+
+            new_trajectories[player].append(transition)
+    return new_trajectories, bet_reward_sum, change_reward_sum
+
 def set_global_seed(seed):
     ''' Set the global see for reproducing results
 

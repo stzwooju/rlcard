@@ -228,6 +228,12 @@ class DQNAgent(object):
             op = v2.assign(v1)
             update_ops.append(op)
         self.sess.run(update_ops)
+    
+    def save(self, path, step):
+        saver = tf.train.Saver()
+        ckpt_path = saver.save(self.sess, path, step)
+
+        return ckpt_path
 
 
 
