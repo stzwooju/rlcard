@@ -6,7 +6,8 @@ import tensorflow as tf
 import rlcard
 from rlcard.agents.badugi_dqn_agent import BadugiDQNAgent
 from rlcard.agents.random_agent import RandomAgent
-from rlcard.utils.utils import set_global_seed
+from rlcard.models.badugi_rule_models import BadugiRuleAgentV1
+from rlcard.utils.utils import set_global_seed, send_slack
 from rlcard.utils.logger import Logger
 
 # Make environment
@@ -14,10 +15,11 @@ env = rlcard.make('badugi')
 eval_env = rlcard.make('badugi')
 
 # Set the iterations numbers and how frequently we evaluate/save plot
-evaluate_every = 100
-save_plot_every = 1000
-checkpoint_every = 100
-evaluate_num = 10000
+evaluate_every = 1000
+send_slack_every = 10000
+save_plot_every = 10000
+checkpoint_every = 10000
+evaluate_num = 1000
 episode_num = 1000000
 
 # Set the the number of steps for collecting normalization statistics
@@ -26,7 +28,7 @@ memory_init_size = 1000
 norm_step = 100
 
 # The paths for saving the logs and learning curves
-root_path = './experiments/badugi_dqn_result/'
+root_path = './experiments/badugi_dqn_result_with_rule/'
 log_path = root_path + 'log.txt'
 csv_path = root_path + 'performance.csv'
 figure_path = root_path + 'figures/'
@@ -49,11 +51,12 @@ with tf.Session() as sess:
                            ckpt_path=checkpoint_path)
 
     random_agent = RandomAgent(action_num=eval_env.action_num)
+    rule_agent = BadugiRuleAgentV1()
 
     sess.run(tf.global_variables_initializer())
 
-    env.set_agents([agent, random_agent, random_agent, random_agent, random_agent])
-    eval_env.set_agents([agent, random_agent, random_agent, random_agent, random_agent])
+    env.set_agents([agent, rule_agent, rule_agent, random_agent, random_agent])
+    eval_env.set_agents([agent, rule_agent, rule_agent, random_agent, random_agent])
 
     # Count the number of steps
     step_counter = 0
@@ -80,6 +83,8 @@ with tf.Session() as sess:
 
         # Evaluate the performance. Play with random agents.
         if episode % evaluate_every == 0:
+            print('\n\nEpisode {}'.format(episode))
+            
             bet_reward = 0
             change_reward = 0
             for eval_episode in range(evaluate_num):
@@ -90,6 +95,8 @@ with tf.Session() as sess:
 
             bet_logger.log('\n########## Evaluation ##########')
             bet_logger.log('Timestep: {} Average bet reward is {}. Average change reward is {}'.format(env.timestep, float(bet_reward)/evaluate_num, float(change_reward)/evaluate_num))
+
+            send_slack('Episode: {} Average bet reward is {}. Average change reward is {}'.format(episode, float(bet_reward)/evaluate_num, float(change_reward)/evaluate_num))
 
             # Add point to logger
             bet_logger.add_point(x=env.timestep, y=float(bet_reward)/evaluate_num)

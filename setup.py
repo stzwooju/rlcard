@@ -30,7 +30,8 @@ setuptools.setup(
         'tensorflow_probability==0.7.0',
         'dm-sonnet==1.35',
         'numpy>=1.16.3',
-        'matplotlib>=3.0'
+        'matplotlib>=3.0',
+        'requests'
     ],
     extras_require=extras,
     requires_python='>=3.5',

@@ -150,6 +150,7 @@ class BadugiGame(object):
         state['raise_nums'] = self.history_raise_nums
         state['payoffs'] = self.get_payoffs()
         state['is_bet'] = self.round.is_bet_round
+        state['round_counter'] = self.round_counter
 
         return state
 

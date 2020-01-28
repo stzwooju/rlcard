@@ -10,3 +10,7 @@ register(
 register(
     model_id = 'uno-rule-v1',
     entry_point='rlcard.models.uno_rule_models:UNORuleModelV1')
+
+register(
+    model_id = 'badugi-rule-v1',
+    entry_point='rlcard.models.badugi_rule_models:BadugiRuleModelV1')

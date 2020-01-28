@@ -20,7 +20,7 @@ class BadugiEnv(Env):
             'die', 'check', 'bbing', 'call', 'ddadang', 'quarter', 'half',
             None, '0', '1', '2', '3', '0,1', '0,2', '0,3', '1,2', '1,3', '2,3', '0,1,2', '0,1,3', '0,2,3', '1,2,3', '0,1,2,3'
         ]
-        self.state_shape=[12]
+        self.state_shape=[64]
 
         with open(os.path.join(rlcard.__path__[0], 'games/badugi/card2index.json'), 'r') as file:
             self.card2index = json.load(file)
@@ -52,18 +52,19 @@ class BadugiEnv(Env):
         processed_state['hand_category'] = state['hand_category']
         processed_state['payoffs'] = state['payoffs']
         processed_state['is_bet'] = state['is_bet']
+        processed_state['round_counter'] = state['round_counter']
 
         cards = state['hand']
         raise_nums = state['raise_nums']
-        # idx = [self.card2index[card] for card in cards]
-        obs = np.zeros(12)
-        # obs[idx] = 1
+        idx = [self.card2index[card] for card in cards]
+        obs = np.zeros(64)
+        obs[idx] = 1
 
         for i in state['hand_best_index']:
-            obs[i] = 1
+            obs[52 + i] = 1
         for i, num in enumerate(raise_nums):
-            obs[4 + i] = num
-        obs[11] = state['hand_category']
+            obs[56 + i] = num
+        obs[63] = state['hand_category']
         processed_state['obs'] = obs
 
         return processed_state

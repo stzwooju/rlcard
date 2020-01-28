@@ -1,4 +1,6 @@
 import random
+import requests
+import json
 import numpy as np
 
 from rlcard.core import Card, Player
@@ -329,13 +331,17 @@ def reorganize_badugi(trajectories):
     change_reward_sum = 0
 
     for player in range(player_num):
+        print(trajectories[player])
+        break
         for i in range(0, len(trajectories[player])-3, 3):
+            done = (i == len(trajectories[player]) - 4)
             if trajectories[player][i]['is_bet']:
                 # reward = trajectories[player][i + 2]['payoffs'][player] - trajectories[player][i]['payoffs'][player]
-                reward = 0
-                if trajectories[player][i + 2]['payoffs'][player] > trajectories[player][i]['payoffs'][player]:
+                if not done:
+                    reward = 0
+                elif trajectories[player][i + 2]['payoffs'][player] > 0:
                     reward = 1
-                elif trajectories[player][i + 2]['payoffs'][player] < trajectories[player][i]['payoffs'][player]:
+                else:
                     reward = -1
                 bet_reward_sum += reward
             else:
@@ -346,7 +352,7 @@ def reorganize_badugi(trajectories):
                 elif trajectories[player][i + 2]['hand_category'] < trajectories[player][i]['hand_category']:
                     reward = -1
                 change_reward_sum += reward
-            done = (i == len(trajectories[player]) - 4)
+
             transition = trajectories[player][i:i+3].copy()
             transition.insert(2, reward)
             transition.append(done)
@@ -410,3 +416,10 @@ def assign_task(task_num, process_num):
     per_tasks = [task_num // process_num] * process_num
     per_tasks[0] += (task_num % process_num)
     return per_tasks
+
+
+def send_slack(msg):
+    data = {'text': msg}
+    res = requests.post(
+        'https://hooks.slack.com/services/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', data=json.dumps(data),
+        headers={'Content-Type': 'application/json'})
