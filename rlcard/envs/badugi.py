@@ -50,7 +50,6 @@ class BadugiEnv(Env):
         processed_state['legal_actions'] = legal_actions
         processed_state['hand_best_index'] = state['hand_best_index']
         processed_state['hand_category'] = state['hand_category']
-        processed_state['payoffs'] = state['payoffs']
         processed_state['is_bet'] = state['is_bet']
         processed_state['round_counter'] = state['round_counter']
 

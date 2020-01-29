@@ -1,13 +1,13 @@
 
 class BadugiRound(object):
 
-    def __init__(self, allowed_raise_num, num_players, seed_money):
+    def __init__(self, start_pointer, allowed_raise_num, num_players, seed_money):
         ''' Initilize the round class
 
         Args:
             num_players (int): The number of players
         '''
-        self.start_pointer = None
+        self.start_pointer = start_pointer
         self.game_pointer = None
         self.allowed_raise_num = allowed_raise_num
         self.num_players = num_players
@@ -29,15 +29,14 @@ class BadugiRound(object):
         self.is_bet_round = False
         self.is_first = True
 
-    def start_new_round(self, game_pointer, allowed_raise_num, raised=None):
+    def start_new_round(self, allowed_raise_num, raised=None):
         ''' Start a new bidding round
 
         Args:
             raised (list): Initialize the chips for each player
 
         '''
-        self.start_pointer = game_pointer
-        self.game_pointer = game_pointer
+        self.game_pointer = self.start_pointer
 
         self.allowed_raise_num = allowed_raise_num
         self.previous_bet = 0
@@ -54,6 +53,8 @@ class BadugiRound(object):
 
         self.is_bet_round = not self.is_bet_round
         self.is_first = True
+
+        return self.game_pointer
 
     def proceed_round(self, players, action):
         if action not in self.get_legal_actions():
@@ -89,6 +90,8 @@ class BadugiRound(object):
                 self.have_raised += 1
                 self.not_raise_num = 1
             
+            # print('Raised: {}, Not raised: {}, died: {}'.format(self.have_raised, self.not_raise_num, self.died))
+            
             self.is_first = self.is_first and (action == 'die')
         else:
             players[self.game_pointer].change_cards(action)
@@ -99,6 +102,10 @@ class BadugiRound(object):
         # Skip the folded players
         while players[self.game_pointer].status == 'died':
             self.game_pointer = (self.game_pointer + 1) % self.num_players
+
+        if players[self.start_pointer].status == 'died':
+            while players[self.start_pointer].status == 'died':
+                self.start_pointer = (self.start_pointer + 1) % self.num_players
 
         return self.game_pointer
 

@@ -230,13 +230,15 @@ class Env(object):
         # Loop to play the game
         trajectories[player_id].append(state)
         while not self.is_over():
-            # print('State : {}'.format(tmp))
-            
+            # print('State : {}'.format(state))
+
             # Agent plays
             if not is_training:
                 action = self.agents[player_id].eval_step(state)
             else:
                 action = self.agents[player_id].step(state)
+            
+            # print('Player ID: {}, is_bet: {}, round_counter: {}, action: {}'.format(player_id, state['is_bet'], state['round_counter'], action))
             
             # print('Action : {}'.format(self.decode_action(action)))
 
@@ -247,9 +249,8 @@ class Env(object):
 
             # Set the state and player
             state = next_state
-            trajectories[player_id].append(state)
-
             player_id = next_player_id
+
             # Save state.
             if not self.game.is_over():
                 trajectories[player_id].append(state)
@@ -264,7 +265,7 @@ class Env(object):
 
         # Reorganize the trajectories
         if type(self.game).__name__ == 'BadugiGame':
-            trajectories, bet_reward_sum, change_reward_sum = reorganize_badugi(trajectories)
+            trajectories, bet_reward_sum, change_reward_sum = reorganize_badugi(trajectories, payoffs)
             return trajectories, bet_reward_sum, change_reward_sum
         else:
             trajectories = reorganize(trajectories, payoffs)

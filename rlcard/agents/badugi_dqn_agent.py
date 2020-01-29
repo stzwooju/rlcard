@@ -62,7 +62,8 @@ class BadugiDQNAgent(object):
                 os.makedirs(ckpt_dir)
     
     def feed(self, ts):
-        if ts[0]['is_bet']:
+        # print('State: {}, Action: {}, Reward: {}, Next State: {}, Done: {}'.format(ts[0], ts[1], ts[2], ts[3], ts[4]))
+        if ts[0]['is_bet'] or ts[4]:
             self.bet_agent.feed(ts)
         else:
             self.change_agent.feed(ts)

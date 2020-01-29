@@ -72,6 +72,7 @@ with tf.Session() as sess:
 
         # Feed transitions into agent memory, and train the agent
         for ts in trajectories[0]:
+            # print('State: {}\nAction: {}\nReward: {}\nNext State: {}\nDone: {}\n'.format(ts[0], ts[1], ts[2], ts[3], ts[4]))
             agent.feed(ts)
             step_counter += 1
 
@@ -96,7 +97,7 @@ with tf.Session() as sess:
             bet_logger.log('\n########## Evaluation ##########')
             bet_logger.log('Timestep: {} Average bet reward is {}. Average change reward is {}'.format(env.timestep, float(bet_reward)/evaluate_num, float(change_reward)/evaluate_num))
 
-            send_slack('Episode: {} Average bet reward is {}. Average change reward is {}'.format(episode, float(bet_reward)/evaluate_num, float(change_reward)/evaluate_num))
+            # send_slack('Episode: {} Average bet reward is {}. Average change reward is {}'.format(episode, float(bet_reward)/evaluate_num, float(change_reward)/evaluate_num))
 
             # Add point to logger
             bet_logger.add_point(x=env.timestep, y=float(bet_reward)/evaluate_num)

@@ -315,7 +315,7 @@ def reorganize(trajectories, payoffs):
             new_trajectories[player].append(transition)
     return new_trajectories
 
-def reorganize_badugi(trajectories):
+def reorganize_badugi(trajectories, payoffs):
     ''' Reorganize the trajectory to make it RL friendly
 
     Args:
@@ -330,23 +330,19 @@ def reorganize_badugi(trajectories):
     bet_reward_sum = 0
     change_reward_sum = 0
 
+    # print(trajectories[0])
+
     for player in range(player_num):
-        print(trajectories[player])
-        break
-        for i in range(0, len(trajectories[player])-3, 3):
-            done = (i == len(trajectories[player]) - 4)
-            if trajectories[player][i]['is_bet']:
-                # reward = trajectories[player][i + 2]['payoffs'][player] - trajectories[player][i]['payoffs'][player]
-                if not done:
-                    reward = 0
-                elif trajectories[player][i + 2]['payoffs'][player] > 0:
+        for i in range(0, len(trajectories[player])-2, 2):
+            reward = 0
+            done = (i == len(trajectories[player]) - 3)
+            if done:
+                if payoffs[player] > 0:
                     reward = 1
-                else:
+                elif payoffs[player] < 0:
                     reward = -1
                 bet_reward_sum += reward
-            else:
-                # reward = trajectories[player][i + 2]['hand_category'] - trajectories[player][i]['hand_category']
-                reward = 0
+            elif not trajectories[player][i]['is_bet']:
                 if trajectories[player][i + 2]['hand_category'] > trajectories[player][i]['hand_category']:
                     reward = 1
                 elif trajectories[player][i + 2]['hand_category'] < trajectories[player][i]['hand_category']:

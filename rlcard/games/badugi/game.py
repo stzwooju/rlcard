@@ -40,12 +40,12 @@ class BadugiGame(object):
         self.start_pointer = self.game_pointer = randrange(self.num_players)
 
         # Initilize a bidding round, in the first round
-        self.round = Round(allowed_raise_num=self.allowed_raise_num,
+        self.round = Round(start_pointer=self.start_pointer,
+                           allowed_raise_num=self.allowed_raise_num,
                            num_players=self.num_players,
                            seed_money=self.seed_money)
 
-        self.round.start_new_round(game_pointer=self.game_pointer,
-                                   allowed_raise_num=self.allowed_raise_num,
+        self.game_pointer = self.round.start_new_round(allowed_raise_num=self.allowed_raise_num,
                                    raised=[p.in_chips for p in self.players])
 
         # Count the round. There are 7 rounds in each game.
@@ -93,9 +93,9 @@ class BadugiGame(object):
             self.round_counter += 1
             if self.round_counter >= 4:
                 self.allowed_raise_num = 2
-            self.round.start_new_round(game_pointer=self.game_pointer,
-                                       allowed_raise_num=self.allowed_raise_num,
+            self.game_pointer = self.round.start_new_round(allowed_raise_num=self.allowed_raise_num,
                                        raised=[p.in_chips for p in self.players])
+            state = self.get_state(self.game_pointer)
 
         return state, self.game_pointer
 
@@ -148,7 +148,6 @@ class BadugiGame(object):
         legal_actions = self.get_legal_actions()
         state = self.players[player].get_state(chips, legal_actions)
         state['raise_nums'] = self.history_raise_nums
-        state['payoffs'] = self.get_payoffs()
         state['is_bet'] = self.round.is_bet_round
         state['round_counter'] = self.round_counter
 
